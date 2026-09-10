@@ -205,6 +205,18 @@ function step() {
       // Powder Movement
       if (state === 2) {
         if (dirY !== 0) {
+          // Buoyancy: if submerged in a denser liquid, float upwards
+          const floatY = y - dirY;
+          if (floatY >= 0 && floatY < height) {
+            const upIdx = floatY * width + x;
+            const upType = types[upIdx];
+            if (elState[upType] === 3 && elDensity[upType] > elDensity[type]) {
+              swap(idx, upIdx);
+              flags[upIdx] = currentTick;
+              continue;
+            }
+          }
+
           const targetY = y + dirY;
           if (targetY >= 0 && targetY < height) {
             const belowIdx = targetY * width + x;
@@ -293,7 +305,7 @@ function step() {
           if (targetY >= 0 && targetY < height) {
             const belowIdx = targetY * width + x;
             const belowType = types[belowIdx];
-            if (belowType === 0 || ((elState[belowType] === 3 || elState[belowType] === 4) && elDensity[belowType] < elDensity[type])) {
+            if (belowType === 0 || ((elState[belowType] === 2 || elState[belowType] === 3 || elState[belowType] === 4) && elDensity[belowType] < elDensity[type])) {
               swap(idx, belowIdx);
               flags[belowIdx] = currentTick;
               moved = true;
@@ -306,7 +318,7 @@ function step() {
                 if (ox >= 0 && ox < width) {
                   const diagIdx = targetY * width + ox;
                   const diagType = types[diagIdx];
-                  if (diagType === 0 || (elState[diagType] === 3 && elDensity[diagType] < elDensity[type])) {
+                  if (diagType === 0 || ((elState[diagType] === 2 || elState[diagType] === 3) && elDensity[diagType] < elDensity[type])) {
                     swap(idx, diagIdx);
                     flags[diagIdx] = currentTick;
                     moved = true;
@@ -395,7 +407,7 @@ function step() {
           if (targetY >= 0 && targetY < height) {
             const aboveIdx = targetY * width + x;
             const aboveType = types[aboveIdx];
-            if (aboveType === 0 || (elState[aboveType] === 4 && elDensity[aboveType] > elDensity[type])) {
+            if (aboveType === 0 || (elState[aboveType] === 4 && elDensity[aboveType] > elDensity[type]) || elState[aboveType] === 3) {
               swap(idx, aboveIdx);
               flags[aboveIdx] = currentTick;
               moved = true;
@@ -404,7 +416,8 @@ function step() {
               const diagX = x + randX;
               if (diagX >= 0 && diagX < width) {
                 const dIdx = targetY * width + diagX;
-                if (types[dIdx] === 0) {
+                const dType = types[dIdx];
+                if (dType === 0 || elState[dType] === 3) {
                   swap(idx, dIdx);
                   flags[dIdx] = currentTick;
                   moved = true;
