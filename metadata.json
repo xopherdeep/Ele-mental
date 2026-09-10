@@ -1,0 +1,6 @@
+{
+  "name": "Elemental Sandspiel",
+  "description": "Modern falling-sand element simulation with complex chemical reactions, multithreaded fluid physics, and custom element builder.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
